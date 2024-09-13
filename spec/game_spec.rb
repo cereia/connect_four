@@ -16,7 +16,12 @@ describe Game do
         allow(game_play_game).to receive(:player_answer).and_return(yes_input)
       end
 
-      it 'starts a game of connect four' do
+      it 'creates a new Board object' do
+        expect(Board).to receive(:new)
+        game_play_game.play_game
+      end
+
+      it 'asks for a color' do
         yes_message = 'Would you like to be red or blue? (R/B)'
         expect(game_play_game).to receive(:puts).with(yes_message)
         game_play_game.play_game
@@ -29,23 +34,56 @@ describe Game do
         allow(game_play_game).to receive(:player_answer).and_return(no_input)
       end
 
-      it 'puts a meesage to the console and exits' do
+      it 'puts a message to the console and exits' do
         no_message = ':)'
         expect(game_play_game).to receive(:puts).with(no_message)
         game_play_game.play_game
       end
     end
+  end
 
-    context 'when a user inputs an invalid input' do
+  describe '#player_answer' do
+    subject(:game_player_answer) { described_class.new }
+
+    context 'when a user inputs a valid input' do
       before do
-        invalid_input = 'x'
-        allow(game_play_game).to receive(:player_answer).and_return(invalid_input)
+        valid_input = 'N'
+        allow(game_player_answer).to receive(:player_answer_input).and_return(valid_input)
       end
 
-      it 'an error message is shown' do
-        invalid_message = 'Invalid input. Please enter (Y/N) only.'
-        expect(game_play_game).to receive(:puts).with(invalid_message)
-        game_play_game.play_game
+      it 'stops the loop and does not display an error message' do
+        invalid_message = 'Invalid input. Please enter (Y/N).'
+        expect(game_player_answer).not_to receive(:puts).with(invalid_message)
+        game_player_answer.player_answer
+      end
+    end
+
+    context 'when a user inputs an invalid answer and a valid one' do
+      before do
+        invalid_input = 'x'
+        valid_input = 'n'
+        allow(game_player_answer).to receive(:player_answer_input).and_return(invalid_input, valid_input)
+      end
+
+      it 'completes one loop and an error message is shown' do
+        invalid_message = 'Invalid input. Please enter (Y/N).'
+        expect(game_player_answer).to receive(:puts).with(invalid_message).once
+        game_player_answer.player_answer
+      end
+    end
+
+    context 'when a user inputs 2 invalid inputs and a valid one' do
+      before do
+        invalid1 = '@'
+        invalid2 = '234'
+        valid_input = 'n'
+        allow(game_player_answer).to receive(:player_answer_input).and_return(invalid1, invalid2, valid_input)
+      end
+
+      it 'completes two loops and displays an error message twice' do
+        invalid_message = 'Invalid input. Please enter (Y/N).'
+        expect(game_player_answer).to receive(:puts).with(invalid_message).twice
+        game_player_answer.player_answer
       end
     end
   end
