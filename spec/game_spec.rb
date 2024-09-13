@@ -177,6 +177,38 @@ describe Game do
       end
     end
   end
+
+  describe '#verify_player_color' do
+    subject(:game_verify_color) { described_class.new }
+
+    context 'when user input is valid' do
+      it 'returns valid input' do
+        valid_color = 'RE'
+        verified_color = game_verify_color.verify_player_color(valid_color)
+        expect(verified_color).to eq('R')
+      end
+
+      it 'returns valid input' do
+        valid_color = 'blu'
+        verified_color = game_verify_color.verify_player_color(valid_color)
+        expect(verified_color).to eq('b')
+      end
+    end
+
+    context 'when user input is invalid' do
+      it 'returns nil' do
+        invalid_input = 'pink'
+        verified_color = game_verify_color.verify_player_color(invalid_input)
+        expect(verified_color).to be_nil
+      end
+
+      it 'returns nil' do
+        invalid_input = '&'
+        verified_color = game_verify_color.verify_player_color(invalid_input)
+        expect(verified_color).to be_nil
+      end
+    end
+  end
 end
 
 # rubocop:enable Metrics/BlockLength
