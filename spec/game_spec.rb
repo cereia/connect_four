@@ -21,9 +21,8 @@ describe Game do
         game_play_game.play_game
       end
 
-      it 'asks for a color' do
-        yes_message = 'Would you like to be red or blue? (R/B)'
-        expect(game_play_game).to receive(:puts).with(yes_message)
+      it 'calls #create_players once' do
+        expect(game_play_game).to receive(:create_players).once
         game_play_game.play_game
       end
     end
@@ -35,7 +34,7 @@ describe Game do
       end
 
       it 'puts a message to the console and exits' do
-        no_message = ':)'
+        no_message = 'Thank you for checking out the game :)'
         expect(game_play_game).to receive(:puts).with(no_message)
         game_play_game.play_game
       end
@@ -84,6 +83,26 @@ describe Game do
         invalid_message = 'Invalid input. Please enter (Y/N).'
         expect(game_player_answer).to receive(:puts).with(invalid_message).twice
         game_player_answer.player_answer
+      end
+    end
+  end
+
+  describe '#verify_player_answer' do
+    subject(:game_verify_answer) { described_class.new }
+
+    context 'when user input is valid' do
+      it 'returns a valid input' do
+        user_input = 'n'
+        verified_input = game_verify_answer.verify_player_answer(user_input)
+        expect(verified_input).to eq('n')
+      end
+    end
+
+    context 'when user input is invalid' do
+      it 'returns nil' do
+        user_input = '3'
+        verified_input = game_verify_answer.verify_player_answer(user_input)
+        expect(verified_input).to be_nil
       end
     end
   end

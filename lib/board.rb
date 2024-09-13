@@ -5,6 +5,5 @@ class Board
   def initialize
     @board = [*0..41]
     @board.each { |i| @board[i] = '◯' }
-    puts @board.length
   end
 end

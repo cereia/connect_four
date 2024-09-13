@@ -2,6 +2,8 @@
 
 # a class that holds the information needed to play a game of Connect Four
 class Game
+  attr_accessor :board
+
   def initialize
     @board = nil
   end
@@ -11,10 +13,31 @@ class Game
 
     if answer.match?(/y/i)
       @board = Board.new
-      puts 'Would you like to be red or blue? (R/B)'
+      create_players
     else
-      puts ':)'
+      puts 'Thank you for checking out the game :)'
     end
+  end
+
+  def create_players
+    color = player_color
+    @player1 = color.match?(/r/i) ? Player.new('🔴') : Player.new('🔵')
+    @player2 = @player1.symbol == '🔴' ? Player.new('🔵') : Player.new('🔴')
+
+    puts "Player1: #{@player1.symbol}\nPlayer2: #{@player2.symbol}"
+  end
+
+  def player_color
+    loop do
+      color = verify_player_color(player_color_input)
+      return color if color
+
+      puts 'Invalid input. Please enter (R/B).'
+    end
+  end
+
+  def verify_player_color(color)
+    color[0] if color.match?(/^b[lue]*|^r[ed]*/i)
   end
 
   def player_answer
@@ -27,13 +50,18 @@ class Game
   end
 
   def verify_player_answer(answer)
-    answer if answer.match?(/^[y|n]$/i)
+    answer if answer.match?(/^y[es]*|^no*/i)
   end
 
   private
 
   def player_answer_input
     puts 'Would you like to play Connect Four? (Y/N)'
+    gets.chomp
+  end
+
+  def player_color_input
+    puts 'Would you like to be red or blue? (R/B)'
     gets.chomp
   end
 end
