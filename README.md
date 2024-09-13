@@ -1,4 +1,4 @@
-# connect4
+# connect_four
 
 Connect Four is a simple 2 player game where the player drops colored pieces onto the board from above. Players win if they manage to get 4 of their pieces in a consecutive row, column, or along a diagonal.
 
