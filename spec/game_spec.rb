@@ -50,6 +50,11 @@ describe Game do
         allow(game_player_answer).to receive(:player_answer_input).and_return(valid_input)
       end
 
+      it 'returns valid input' do
+        answer = game_player_answer.player_answer
+        expect(answer).to eq('N')
+      end
+
       it 'stops the loop and does not display an error message' do
         invalid_message = 'Invalid input. Please enter (Y/N).'
         expect(game_player_answer).not_to receive(:puts).with(invalid_message)
@@ -118,6 +123,58 @@ describe Game do
     it 'creates two new Player instances' do
       expect(Player).to receive(:new).twice
       game_create_players.create_players
+    end
+  end
+
+  describe '#player_color' do
+    subject(:game_player_color) { described_class.new }
+
+    context 'when a user input is valid' do
+      before do
+        valid_input = 'red'
+        allow(game_player_color).to receive(:player_color_input).and_return(valid_input)
+      end
+
+      it 'returns valid input' do
+        color = game_player_color.player_color
+        expect(color).to eq('r')
+      end
+
+      it 'stops the loop and does not display an error message' do
+        invalid_message = 'Invalid input. Please enter (R/B).'
+        expect(game_player_color).not_to receive(:puts).with(invalid_message)
+        game_player_color.player_color
+      end
+    end
+
+    context 'when a user inputs an invalid and a valid input' do
+      before do
+        invalid_input = ')'
+        valid_input = 'b'
+        allow(game_player_color).to receive(:player_color_input).and_return(invalid_input, valid_input)
+      end
+
+      it 'completes a loop and displays an error message' do
+        invalid_message = 'Invalid input. Please enter (R/B).'
+        expect(game_player_color).to receive(:puts).with(invalid_message).once
+        game_player_color.player_color
+      end
+    end
+
+    context 'when a user inputs 3 invalid and one valid input' do
+      before do
+        invalid1 = '<'
+        invalid2 = '34'
+        invalid3 = 'we'
+        valid = 'R'
+        allow(game_player_color).to receive(:player_color_input).and_return(invalid1, invalid2, invalid3, valid)
+      end
+
+      it 'completes 3 loops and displays error message 3 times' do
+        invalid_message = 'Invalid input. Please enter (R/B).'
+        expect(game_player_color).to receive(:puts).with(invalid_message).exactly(3).times
+        game_player_color.player_color
+      end
     end
   end
 end
