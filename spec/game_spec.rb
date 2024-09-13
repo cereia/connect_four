@@ -106,6 +106,20 @@ describe Game do
       end
     end
   end
+
+  describe '#create_players' do
+    subject(:game_create_players) { described_class.new }
+
+    before do
+      red_input = 'r'
+      allow(game_create_players).to receive(:player_color).and_return(red_input)
+    end
+
+    it 'creates two new Player instances' do
+      expect(Player).to receive(:new).twice
+      game_create_players.create_players
+    end
+  end
 end
 
 # rubocop:enable Metrics/BlockLength

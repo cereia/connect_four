@@ -6,6 +6,8 @@ class Game
 
   def initialize
     @board = nil
+    @player1 = nil
+    @player2 = nil
   end
 
   def play_game
@@ -22,9 +24,9 @@ class Game
   def create_players
     color = player_color
     @player1 = color.match?(/r/i) ? Player.new('🔴') : Player.new('🔵')
-    @player2 = @player1.symbol == '🔴' ? Player.new('🔵') : Player.new('🔴')
+    @player2 = color.match?(/r/i) ? Player.new('🔵') : Player.new('🔴')
 
-    puts "Player1: #{@player1.symbol}\nPlayer2: #{@player2.symbol}"
+    puts "Player1: #{@player1}\nPlayer2: #{@player2}"
   end
 
   def player_color
