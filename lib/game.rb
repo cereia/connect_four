@@ -2,6 +2,7 @@
 
 # a class that holds the information needed to play a game of Connect Four
 class Game
+  include Symbols
   attr_accessor :board
 
   def initialize
@@ -23,8 +24,8 @@ class Game
 
   def create_players
     color = player_color
-    @player1 = color.match?(/r/i) ? Player.new('🔴') : Player.new('🔵')
-    @player2 = color.match?(/r/i) ? Player.new('🔵') : Player.new('🔴')
+    @player1 = color.match?(/r/i) ? Player.new(red_circle) : Player.new(blue_circle)
+    @player2 = color.match?(/r/i) ? Player.new(blue_circle) : Player.new(red_circle)
 
     puts "Player1: #{@player1}\nPlayer2: #{@player2}"
   end
