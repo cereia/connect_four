@@ -4,9 +4,11 @@
 class Board
   include Symbols
 
-  def initialize
+  def initialize(player1, player2)
     @board = Array.new(6) { Array.new(7) { empty_circle } }
     print_board
+    @player1 = player1
+    @player2 = player2
   end
 
   def print_board

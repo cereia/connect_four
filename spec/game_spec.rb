@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative '../lib/symbols'
 require_relative '../lib/player'
 require_relative '../lib/board'
 require_relative '../lib/game'
@@ -206,6 +207,52 @@ describe Game do
         invalid_input = '&'
         verified_color = game_verify_color.verify_player_color(invalid_input)
         expect(verified_color).to be_nil
+      end
+    end
+  end
+
+  describe '#play_round' do
+    subject(:game_round) { described_class.new }
+    # let(:player1_round) { instance_double(Player, red_circle) }
+    # let(:player2_round) { instance_double(Player, blue_circle) }
+    # let(:board_round) { instance_double(Board, player1_round, player2_round) }
+    # before do
+    #   game_round.instance_variable_set(:@board, board_round)
+    #   game_round.instance_variable_set(:@player1, player1_round)
+    #   game_round.instance_variable_set(:@player2, player2_round)
+    # end
+
+    context 'when round < 7' do
+      before do
+        game_round.instance_variable_set(:@round, 5)
+      end
+
+      it 'places the appropriate symbol in the indicated column' do
+        expect(game_round).to receive(:puts).with('place mark')
+        game_round.play_round
+      end
+    end
+
+    context 'when round is between 7 and 42' do
+      before do
+        game_round.instance_variable_set(:@round, 9)
+      end
+
+      xit 'checks for a winner' do
+        expect(game_round).to receive(:puts).with('is there a winner?')
+        game_round.play_round
+      end
+    end
+
+    context 'when round == 42' do
+      before do
+        game_round.instance_variable_set(:@round, 42)
+        allow(game_round).to receive(:player_answer).and_return('n')
+      end
+
+      xit 'calls #play_game to start a new Connect Four game' do
+        expect(game_round).to receive(:play_game)
+        game_round.play_round
       end
     end
   end

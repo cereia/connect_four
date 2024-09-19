@@ -3,7 +3,7 @@
 # a class that holds the information needed to play a game of Connect Four
 class Game
   include Symbols
-  attr_accessor :board
+  attr_accessor :board, :round, :player1, :player2
 
   def initialize
     @board = nil
@@ -15,8 +15,10 @@ class Game
     answer = player_answer
 
     if answer.match?(/y/i)
-      @board = Board.new
       create_players
+      @board = Board.new(@player1, @player2)
+      @round = 1
+      play_round
     else
       puts 'Thank you for checking out the game :)'
     end
@@ -24,10 +26,10 @@ class Game
 
   def create_players
     color = player_color
-    @player1 = color.match?(/r/i) ? Player.new(red_circle) : Player.new(blue_circle)
-    @player2 = color.match?(/r/i) ? Player.new(blue_circle) : Player.new(red_circle)
+    player1 = color.match?(/r/i) ? Player.new(red_circle) : Player.new(blue_circle)
+    player2 = color.match?(/r/i) ? Player.new(blue_circle) : Player.new(red_circle)
 
-    puts "Player1: #{@player1}\nPlayer2: #{@player2}"
+    puts "Player1: #{player1}\nPlayer2: #{player2}"
   end
 
   def player_color
@@ -54,6 +56,17 @@ class Game
 
   def verify_player_answer(answer)
     answer if answer.match?(/^y[es]*|^no*/i)
+  end
+
+  def play_round
+    if round < 7
+      puts 'place mark'
+    elsif round < 42
+      puts 'is there a winner?'
+    else
+      puts 'there was a draw'
+      play_game
+    end
   end
 
   private
