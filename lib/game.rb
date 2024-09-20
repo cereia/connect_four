@@ -62,8 +62,9 @@ class Game
   def play_round
     if round < 7
       place_symbol
-    elsif round < 42
+    elsif round < 43
       puts 'is there a winner?'
+      place_symbol
     else
       puts 'There was a tie!'
       play_game
@@ -87,9 +88,7 @@ class Game
   def place_column_number
     loop do
       number = verify_player_number(player_number_input)
-      return number if number
-
-      # need to add one more level of verification: verify that the same column number is chosen max 6 times
+      return number if number && times_a_column_was_picked(number) < 6
 
       puts 'Invalid input'
     end

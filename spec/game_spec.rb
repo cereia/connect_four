@@ -234,7 +234,7 @@ describe Game do
       end
     end
 
-    context 'when round is between 7 and 42' do
+    context 'when round is between 7 and 42 and there is no winner' do
       before do
         game_round.instance_variable_set(:@round, 9)
       end
@@ -243,15 +243,20 @@ describe Game do
         expect(game_round).to receive(:puts).with('is there a winner?')
         game_round.play_round
       end
+
+      it 'calls #place_symbol when there is no winner' do
+        expect(game_round).to receive(:place_symbol)
+        game_round.play_round
+      end
     end
 
-    context 'when round == 42' do
+    context 'when round == 43' do
       before do
-        game_round.instance_variable_set(:@round, 42)
+        game_round.instance_variable_set(:@round, 43)
         allow(game_round).to receive(:player_answer).and_return('n')
       end
 
-      xit 'calls #play_game to start a new Connect Four game' do
+      it 'calls #play_game to start a new Connect Four game' do
         expect(game_round).to receive(:play_game)
         game_round.play_round
       end
@@ -326,9 +331,10 @@ describe Game do
   describe '#place_column_number' do
     subject(:game_place_column_number) { described_class.new }
 
-    context 'when user input is valid' do
+    context 'when user input is valid and input was chosen less than 6 times' do
       before do
         valid_input = '7'
+        game_place_column_number.instance_variable_set(:@column_history, [1, 1, 5, 7])
         allow(game_place_column_number).to receive(:player_number_input).and_return(valid_input)
       end
 
@@ -343,6 +349,21 @@ describe Game do
       end
     end
 
+    context 'when user inputs a valid input that was chosen more than 6 times and another valid input' do
+      before do
+        invalid_input = '3'
+        valid_input = '1'
+        game_place_column_number.instance_variable_set(:@column_history, [3, 3, 3, 3, 3, 1, 3])
+        allow(game_place_column_number).to receive(:player_number_input).and_return(invalid_input, valid_input)
+      end
+
+      it 'completes a loop and displays the error message once' do
+        error_message = 'Invalid input'
+        expect(game_place_column_number).to receive(:puts).with(error_message).once
+        game_place_column_number.place_column_number
+      end
+    end
+
     context 'when user inputs an invalid and valid input' do
       before do
         invalid_input = '^^'
@@ -350,7 +371,7 @@ describe Game do
         allow(game_place_column_number).to receive(:player_number_input).and_return(invalid_input, valid_input)
       end
 
-      it 'completes the loop and displays the error message' do
+      it 'completes the loop and displays the error message once' do
         error_message = 'Invalid input'
         expect(game_place_column_number).to receive(:puts).with(error_message).once
         game_place_column_number.place_column_number
