@@ -9,6 +9,7 @@ class Game
     @board = nil
     @player1 = nil
     @player2 = nil
+    @column_history = []
   end
 
   def play_game
@@ -16,7 +17,7 @@ class Game
 
     if answer.match?(/y/i)
       create_players
-      @board = Board.new(@player1, @player2)
+      @board = Board.new
       @round = 1
       play_round
     else
@@ -71,15 +72,22 @@ class Game
 
   def place_symbol
     column = place_column_number
+    row = 5 - times_a_column_was_picked(column)
 
-    board.place(column)
+    board.update_board(column, row, player_symbol)
+    @column_history << column
+    @round += 1
     play_round
+  end
+
+  def player_symbol
+    round.odd? ? player1.symbol : player2.symbol
   end
 
   def place_column_number
     loop do
-      answer = verify_player_number(player_number_input)
-      return answer if answer
+      number = verify_player_number(player_number_input)
+      return number if number
 
       # need to add one more level of verification: verify that the same column number is chosen max 6 times
 
@@ -89,6 +97,10 @@ class Game
 
   def verify_player_number(num)
     num.to_i if num.match(/^[1-7]$/)
+  end
+
+  def times_a_column_was_picked(column)
+    @column_history.count(column)
   end
 
   private

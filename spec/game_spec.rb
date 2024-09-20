@@ -260,21 +260,38 @@ describe Game do
 
   describe '#place_symbol' do
     subject(:game_place_symbol) { described_class.new }
-    # let(:player1_place_symbol) { instance_double(Player, game_place_symbol.red_circle) }
-    # let(:player2_place_symbol) { instance_double(Player, game_place_symbol.blue_circle) }
+    let(:player1_place_symbol) { instance_double(Player, symbol: game_place_symbol.red_circle) }
+    let(:player2_place_symbol) { instance_double(Player, symbol: game_place_symbol.blue_circle) }
     let(:board_place_symbol) { instance_double(Board) }
 
     before do
       game_place_symbol.instance_variable_set(:@board, board_place_symbol)
+      game_place_symbol.instance_variable_set(:@round, 3)
+      game_place_symbol.instance_variable_set(:@player1, player1_place_symbol)
+      game_place_symbol.instance_variable_set(:@player2, player2_place_symbol)
+      game_place_symbol.instance_variable_set(:@column_history, [1, 4])
       allow(game_place_symbol).to receive(:player_number_input).and_return('7')
       allow(game_place_symbol).to receive(:play_round)
-      allow(board_place_symbol).to receive(:place)
+      allow(board_place_symbol).to receive(:update_board)
+      allow(game_place_symbol).to receive(:times_a_column_was_picked).and_return(0)
     end
 
     context 'places the appropriate symbol in the appropriate location' do
-      it 'calls the board object\'s place method once' do
-        expect(board_place_symbol).to receive(:place).with(7)
+      it 'calls the board object\'s #update_board method once' do
+        symbol = game_place_symbol.red_circle
+        expect(board_place_symbol).to receive(:update_board).with(7, 5, symbol)
         game_place_symbol.place_symbol
+      end
+
+      it 'appends the column number to the @column_history array' do
+        game_place_symbol.place_symbol
+        history = game_place_symbol.instance_variable_get(:@column_history)
+        expect(history).to eql([1, 4, 7])
+      end
+
+      it 'increments @round' do
+        game_place_symbol.place_symbol
+        expect { game_place_symbol.place_symbol }.to change(game_place_symbol, :round).by(1)
       end
 
       it 'calls #play_round' do
@@ -338,6 +355,17 @@ describe Game do
         expect(game_place_column_number).to receive(:puts).with(error_message).once
         game_place_column_number.place_column_number
       end
+    end
+  end
+
+  describe '#times_a_column_was_picked' do
+    subject(:game_times_picked) { described_class.new }
+
+    it 'returns the number of times a column number appears in the @column_history' do
+      game_times_picked.instance_variable_set(:@column_history, [1, 4, 1, 2, 4, 6, 7])
+
+      times = game_times_picked.times_a_column_was_picked(1)
+      expect(times).to eql(2)
     end
   end
 end
