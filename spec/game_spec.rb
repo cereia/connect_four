@@ -15,6 +15,7 @@ describe Game do
       before do
         yes_input = 'y'
         allow(game_play_game).to receive(:player_answer).and_return(yes_input)
+        allow(game_play_game).to receive(:play_round)
       end
 
       it 'creates a new Board object' do
@@ -228,7 +229,7 @@ describe Game do
       end
 
       it 'places the appropriate symbol in the indicated column' do
-        expect(game_round).to receive(:puts).with('place mark')
+        expect(game_round).to receive(:place_symbol)
         game_round.play_round
       end
     end
@@ -253,6 +254,89 @@ describe Game do
       xit 'calls #play_game to start a new Connect Four game' do
         expect(game_round).to receive(:play_game)
         game_round.play_round
+      end
+    end
+  end
+
+  describe '#place_symbol' do
+    subject(:game_place_symbol) { described_class.new }
+    # let(:player1_place_symbol) { instance_double(Player, game_place_symbol.red_circle) }
+    # let(:player2_place_symbol) { instance_double(Player, game_place_symbol.blue_circle) }
+    let(:board_place_symbol) { instance_double(Board) }
+
+    before do
+      game_place_symbol.instance_variable_set(:@board, board_place_symbol)
+      allow(game_place_symbol).to receive(:player_number_input).and_return('7')
+      allow(game_place_symbol).to receive(:play_round)
+      allow(board_place_symbol).to receive(:place)
+    end
+
+    context 'places the appropriate symbol in the appropriate location' do
+      it 'calls the board object\'s place method once' do
+        expect(board_place_symbol).to receive(:place).with(7)
+        game_place_symbol.place_symbol
+      end
+
+      it 'calls #play_round' do
+        expect(game_place_symbol).to receive(:play_round).once
+        game_place_symbol.place_symbol
+      end
+    end
+  end
+
+  describe '#verify_player_number' do
+    subject(:game_verify_number) { described_class.new }
+
+    context 'when user input is valid' do
+      it 'returns valid input' do
+        valid_input = '4'
+        allow(game_verify_number).to receive(:player_number_input).and_return(valid_input)
+        verified_number = game_verify_number.verify_player_number(valid_input)
+        expect(verified_number).to eq(4)
+      end
+    end
+
+    context 'when user input is invalid' do
+      it 'returns nil' do
+        invalid_input = '9'
+        allow(game_verify_number).to receive(:player_number_input).and_return(invalid_input)
+        verified_number = game_verify_number.verify_player_number(invalid_input)
+        expect(verified_number).to be_nil
+      end
+    end
+  end
+
+  describe '#place_column_number' do
+    subject(:game_place_column_number) { described_class.new }
+
+    context 'when user input is valid' do
+      before do
+        valid_input = '7'
+        allow(game_place_column_number).to receive(:player_number_input).and_return(valid_input)
+      end
+
+      it 'stops the loop and does not display the error message' do
+        error_message = 'Invalid input'
+        expect(game_place_column_number).not_to receive(:puts).with(error_message)
+        game_place_column_number.place_column_number
+      end
+
+      it 'returns valid input' do
+        expect(game_place_column_number.place_column_number).to eq(7)
+      end
+    end
+
+    context 'when user inputs an invalid and valid input' do
+      before do
+        invalid_input = '^^'
+        valid_input = '5'
+        allow(game_place_column_number).to receive(:player_number_input).and_return(invalid_input, valid_input)
+      end
+
+      it 'completes the loop and displays the error message' do
+        error_message = 'Invalid input'
+        expect(game_place_column_number).to receive(:puts).with(error_message).once
+        game_place_column_number.place_column_number
       end
     end
   end

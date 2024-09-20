@@ -26,8 +26,8 @@ class Game
 
   def create_players
     color = player_color
-    player1 = color.match?(/r/i) ? Player.new(red_circle) : Player.new(blue_circle)
-    player2 = color.match?(/r/i) ? Player.new(blue_circle) : Player.new(red_circle)
+    @player1 = color.match?(/r/i) ? Player.new(red_circle) : Player.new(blue_circle)
+    @player2 = color.match?(/r/i) ? Player.new(blue_circle) : Player.new(red_circle)
 
     puts "Player1: #{player1}\nPlayer2: #{player2}"
   end
@@ -60,13 +60,35 @@ class Game
 
   def play_round
     if round < 7
-      puts 'place mark'
+      place_symbol
     elsif round < 42
       puts 'is there a winner?'
     else
-      puts 'there was a draw'
+      puts 'There was a tie!'
       play_game
     end
+  end
+
+  def place_symbol
+    column = place_column_number
+
+    board.place(column)
+    play_round
+  end
+
+  def place_column_number
+    loop do
+      answer = verify_player_number(player_number_input)
+      return answer if answer
+
+      # need to add one more level of verification: verify that the same column number is chosen max 6 times
+
+      puts 'Invalid input'
+    end
+  end
+
+  def verify_player_number(num)
+    num.to_i if num.match(/^[1-7]$/)
   end
 
   private
@@ -78,6 +100,11 @@ class Game
 
   def player_color_input
     puts 'Would you like to be red or blue? (R/B)'
+    gets.chomp
+  end
+
+  def player_number_input
+    puts 'Please choose a column number from 1 to 7'
     gets.chomp
   end
 end

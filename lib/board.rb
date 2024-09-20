@@ -11,6 +11,12 @@ class Board
     @player2 = player2
   end
 
+  def place(column)
+    puts "place the mark in #{column}"
+  end
+
+  private
+
   def print_board
     @board.each { |row| puts row.join(' ') }
     puts [*1..7].join(' ')
