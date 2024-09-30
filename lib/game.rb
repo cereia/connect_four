@@ -35,7 +35,9 @@ class Game
 
   def player_color
     loop do
-      color = verify_player_color(player_color_input)
+      puts 'Would you like to be red or blue? (R/B)'
+
+      color = verify_player_color(player_input)
       return color if color
 
       puts 'Invalid input. Please enter (R/B).'
@@ -48,7 +50,9 @@ class Game
 
   def player_answer
     loop do
-      answer = verify_player_answer(player_answer_input)
+      puts 'Would you like to play Connect Four? (Y/N)'
+
+      answer = verify_player_answer(player_input)
       return answer if answer
 
       puts 'Invalid input. Please enter (Y/N).'
@@ -95,7 +99,9 @@ class Game
 
   def place_column_number
     loop do
-      number = verify_player_number(player_number_input)
+      puts 'Please choose a column number from 1 to 7'
+
+      number = verify_player_number(player_input)
       return number if number && times_a_column_was_picked(number) < 6
 
       puts 'Invalid input'
@@ -117,18 +123,7 @@ class Game
 
   private
 
-  def player_answer_input
-    puts 'Would you like to play Connect Four? (Y/N)'
-    gets.chomp
-  end
-
-  def player_color_input
-    puts 'Would you like to be red or blue? (R/B)'
-    gets.chomp
-  end
-
-  def player_number_input
-    puts 'Please choose a column number from 1 to 7'
+  def player_input
     gets.chomp
   end
 end

@@ -29,7 +29,7 @@ class Board
       transform_item.each do |transformation|
         total += check_transformation([row, column - 1], transformation, symbol)
       end
-      matches << total if total > 1
+      matches << total
     end
     matches.max
   end

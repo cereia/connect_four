@@ -46,10 +46,14 @@ describe Game do
   describe '#player_answer' do
     subject(:game_player_answer) { described_class.new }
 
+    before do
+      allow(game_player_answer).to receive(:puts)
+    end
+
     context 'when a user inputs a valid input' do
       before do
         valid_input = 'N'
-        allow(game_player_answer).to receive(:player_answer_input).and_return(valid_input)
+        allow(game_player_answer).to receive(:player_input).and_return(valid_input)
       end
 
       it 'returns valid input' do
@@ -68,7 +72,7 @@ describe Game do
       before do
         invalid_input = 'x'
         valid_input = 'n'
-        allow(game_player_answer).to receive(:player_answer_input).and_return(invalid_input, valid_input)
+        allow(game_player_answer).to receive(:player_input).and_return(invalid_input, valid_input)
       end
 
       it 'completes one loop and an error message is shown' do
@@ -83,7 +87,7 @@ describe Game do
         invalid1 = '@'
         invalid2 = '234'
         valid_input = 'n'
-        allow(game_player_answer).to receive(:player_answer_input).and_return(invalid1, invalid2, valid_input)
+        allow(game_player_answer).to receive(:player_input).and_return(invalid1, invalid2, valid_input)
       end
 
       it 'completes two loops and displays an error message twice' do
@@ -131,10 +135,14 @@ describe Game do
   describe '#player_color' do
     subject(:game_player_color) { described_class.new }
 
+    before do
+      allow(game_player_color).to receive(:puts)
+    end
+
     context 'when a user input is valid' do
       before do
         valid_input = 'red'
-        allow(game_player_color).to receive(:player_color_input).and_return(valid_input)
+        allow(game_player_color).to receive(:player_input).and_return(valid_input)
       end
 
       it 'returns valid input' do
@@ -153,7 +161,7 @@ describe Game do
       before do
         invalid_input = ')'
         valid_input = 'b'
-        allow(game_player_color).to receive(:player_color_input).and_return(invalid_input, valid_input)
+        allow(game_player_color).to receive(:player_input).and_return(invalid_input, valid_input)
       end
 
       it 'completes a loop and displays an error message' do
@@ -169,7 +177,7 @@ describe Game do
         invalid2 = '34'
         invalid3 = 'we'
         valid = 'R'
-        allow(game_player_color).to receive(:player_color_input).and_return(invalid1, invalid2, invalid3, valid)
+        allow(game_player_color).to receive(:player_input).and_return(invalid1, invalid2, invalid3, valid)
       end
 
       it 'completes 3 loops and displays error message 3 times' do
@@ -252,7 +260,7 @@ describe Game do
       game_place_symbol.instance_variable_set(:@player1, player1_place_symbol)
       game_place_symbol.instance_variable_set(:@player2, player2_place_symbol)
       game_place_symbol.instance_variable_set(:@column_history, [1, 4])
-      allow(game_place_symbol).to receive(:player_number_input).and_return('7')
+      allow(game_place_symbol).to receive(:player_input).and_return('7')
       allow(board_place_symbol).to receive(:update_board)
       allow(game_place_symbol).to receive(:check_for_game_over)
     end
@@ -278,7 +286,7 @@ describe Game do
     context 'when user input is valid' do
       it 'returns valid input' do
         valid_input = '4'
-        allow(game_verify_number).to receive(:player_number_input).and_return(valid_input)
+        allow(game_verify_number).to receive(:player_input).and_return(valid_input)
         verified_number = game_verify_number.verify_player_number(valid_input)
         expect(verified_number).to eq(4)
       end
@@ -287,7 +295,7 @@ describe Game do
     context 'when user input is invalid' do
       it 'returns nil' do
         invalid_input = '9'
-        allow(game_verify_number).to receive(:player_number_input).and_return(invalid_input)
+        allow(game_verify_number).to receive(:player_input).and_return(invalid_input)
         verified_number = game_verify_number.verify_player_number(invalid_input)
         expect(verified_number).to be_nil
       end
@@ -297,11 +305,15 @@ describe Game do
   describe '#place_column_number' do
     subject(:game_place_column_number) { described_class.new }
 
+    before do
+      allow(game_place_column_number).to receive(:puts)
+    end
+
     context 'when user input is valid and input was chosen less than 6 times' do
       before do
         valid_input = '7'
         game_place_column_number.instance_variable_set(:@column_history, [1, 1, 5, 7])
-        allow(game_place_column_number).to receive(:player_number_input).and_return(valid_input)
+        allow(game_place_column_number).to receive(:player_input).and_return(valid_input)
       end
 
       it 'stops the loop and does not display the error message' do
@@ -320,7 +332,7 @@ describe Game do
         invalid_input = '3'
         valid_input = '1'
         game_place_column_number.instance_variable_set(:@column_history, [3, 3, 3, 3, 3, 1, 3])
-        allow(game_place_column_number).to receive(:player_number_input).and_return(invalid_input, valid_input)
+        allow(game_place_column_number).to receive(:player_input).and_return(invalid_input, valid_input)
       end
 
       it 'completes a loop and displays the error message once' do
@@ -334,7 +346,7 @@ describe Game do
       before do
         invalid_input = '^^'
         valid_input = '5'
-        allow(game_place_column_number).to receive(:player_number_input).and_return(invalid_input, valid_input)
+        allow(game_place_column_number).to receive(:player_input).and_return(invalid_input, valid_input)
       end
 
       it 'completes the loop and displays the error message once' do
