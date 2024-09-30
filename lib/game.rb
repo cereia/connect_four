@@ -60,25 +60,33 @@ class Game
   end
 
   def play_round
-    if round < 7
-      place_symbol
-    elsif round < 43
-      puts 'is there a winner?'
+    if round < 43
       place_symbol
     else
       puts 'There was a tie!'
-      play_game
+      restart
     end
   end
 
   def place_symbol
+    puts "It is #{player_symbol}'s turn."
     column = place_column_number
     row = 5 - times_a_column_was_picked(column)
+    player = player_symbol
 
-    board.update_board(column, row, player_symbol)
-    @column_history << column
-    @round += 1
-    play_round
+    board.update_board(row, column, player)
+    check_for_game_over(row, column, player)
+  end
+
+  def check_for_game_over(row, column, symbol)
+    if @board.check_rows(row, column, symbol) > 3
+      puts "The winner is #{symbol == player1.symbol ? 'Player1' : 'Player2'}!"
+      restart
+    else
+      @column_history << column
+      @round += 1
+      play_round
+    end
   end
 
   def player_symbol
@@ -100,6 +108,11 @@ class Game
 
   def times_a_column_was_picked(column)
     @column_history.count(column)
+  end
+
+  def restart
+    new_game = Game.new
+    new_game.play_game
   end
 
   private

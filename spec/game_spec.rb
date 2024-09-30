@@ -214,50 +214,27 @@ describe Game do
 
   describe '#play_round' do
     subject(:game_round) { described_class.new }
-    # let(:player1_round) { instance_double(Player, red_circle) }
-    # let(:player2_round) { instance_double(Player, blue_circle) }
-    # let(:board_round) { instance_double(Board, player1_round, player2_round) }
-    # before do
-    #   game_round.instance_variable_set(:@board, board_round)
-    #   game_round.instance_variable_set(:@player1, player1_round)
-    #   game_round.instance_variable_set(:@player2, player2_round)
-    # end
 
-    context 'when round < 7' do
-      before do
-        game_round.instance_variable_set(:@round, 5)
-      end
-
-      it 'places the appropriate symbol in the indicated column' do
-        expect(game_round).to receive(:place_symbol)
-        game_round.play_round
-      end
-    end
-
-    context 'when round is between 7 and 42 and there is no winner' do
+    context 'when round is < 43' do
       before do
         game_round.instance_variable_set(:@round, 9)
+        allow(game_round).to receive(:place_symbol)
       end
 
-      xit 'checks for a winner' do
-        expect(game_round).to receive(:puts).with('is there a winner?')
-        game_round.play_round
-      end
-
-      it 'calls #place_symbol when there is no winner' do
+      it 'calls #place_symbol' do
         expect(game_round).to receive(:place_symbol)
         game_round.play_round
       end
     end
 
-    context 'when round == 43' do
+    context 'when round > 42' do
       before do
         game_round.instance_variable_set(:@round, 43)
         allow(game_round).to receive(:player_answer).and_return('n')
       end
 
-      it 'calls #play_game to start a new Connect Four game' do
-        expect(game_round).to receive(:play_game)
+      it 'calls #restart to start a new Connect Four game' do
+        expect(game_round).to receive(:restart)
         game_round.play_round
       end
     end
@@ -265,8 +242,8 @@ describe Game do
 
   describe '#place_symbol' do
     subject(:game_place_symbol) { described_class.new }
-    let(:player1_place_symbol) { instance_double(Player, symbol: game_place_symbol.red_circle) }
-    let(:player2_place_symbol) { instance_double(Player, symbol: game_place_symbol.blue_circle) }
+    let(:player1_place_symbol) { instance_double(Player, symbol: game_place_symbol.red_circle, positions: []) }
+    let(:player2_place_symbol) { instance_double(Player, symbol: game_place_symbol.blue_circle, positions: []) }
     let(:board_place_symbol) { instance_double(Board) }
 
     before do
@@ -276,31 +253,20 @@ describe Game do
       game_place_symbol.instance_variable_set(:@player2, player2_place_symbol)
       game_place_symbol.instance_variable_set(:@column_history, [1, 4])
       allow(game_place_symbol).to receive(:player_number_input).and_return('7')
-      allow(game_place_symbol).to receive(:play_round)
       allow(board_place_symbol).to receive(:update_board)
-      allow(game_place_symbol).to receive(:times_a_column_was_picked).and_return(0)
+      allow(game_place_symbol).to receive(:check_for_game_over)
     end
 
     context 'places the appropriate symbol in the appropriate location' do
       it 'calls the board object\'s #update_board method once' do
         symbol = game_place_symbol.red_circle
-        expect(board_place_symbol).to receive(:update_board).with(7, 5, symbol)
+        expect(board_place_symbol).to receive(:update_board).with(5, 7, symbol).once
         game_place_symbol.place_symbol
       end
 
-      it 'appends the column number to the @column_history array' do
-        game_place_symbol.place_symbol
-        history = game_place_symbol.instance_variable_get(:@column_history)
-        expect(history).to eql([1, 4, 7])
-      end
-
-      it 'increments @round' do
-        game_place_symbol.place_symbol
-        expect { game_place_symbol.place_symbol }.to change(game_place_symbol, :round).by(1)
-      end
-
-      it 'calls #play_round' do
-        expect(game_place_symbol).to receive(:play_round).once
+      it 'calls #check_for_game_over once' do
+        symbol = game_place_symbol.red_circle
+        expect(game_place_symbol).to receive(:check_for_game_over).with(5, 7, symbol).once
         game_place_symbol.place_symbol
       end
     end
@@ -387,6 +353,74 @@ describe Game do
 
       times = game_times_picked.times_a_column_was_picked(1)
       expect(times).to eql(2)
+    end
+  end
+
+  describe '#check_for_game_over' do
+    subject(:game_game_over) { described_class.new }
+    let(:board_game_over) { instance_double(Board) }
+    let(:player1_game_over) { instance_double(Player, symbol: game_game_over.red_circle) }
+    let(:player2_game_over) { instance_double(Player, symbol: game_game_over.blue_circle) }
+
+    before do
+      game_game_over.instance_variable_set(:@board, board_game_over)
+      game_game_over.instance_variable_set(:@player1, player1_game_over)
+      game_game_over.instance_variable_set(:@player2, player2_game_over)
+    end
+
+    context 'when there is a winner' do
+      before do
+        allow(game_game_over).to receive(:restart)
+        allow(board_game_over).to receive(:check_rows).and_return(4)
+        game_game_over.instance_variable_set(:@round, 7)
+      end
+
+      it 'prints a winner message to the console' do
+        row = 5
+        column = 2
+        symbol = game_game_over.red_circle
+        win_message = 'The winner is Player1!'
+        expect(game_game_over).to receive(:puts).with(win_message)
+        game_game_over.check_for_game_over(row, column, symbol)
+      end
+
+      it 'calls #restart' do
+        row = 5
+        column = 2
+        symbol = game_game_over.red_circle
+        expect(game_game_over).to receive(:restart).once
+        game_game_over.check_for_game_over(row, column, symbol)
+      end
+    end
+
+    context 'when there is no winner' do
+      before do
+        allow(board_game_over).to receive(:check_rows).and_return(2)
+        allow(game_game_over).to receive(:play_round).and_return(1)
+        game_game_over.instance_variable_set(:@column_history, [1, 2, 5])
+        game_game_over.instance_variable_set(:@round, 4)
+      end
+
+      it 'appends the column number to @column history' do
+        symbol = game_game_over.blue_circle
+        game_game_over.check_for_game_over(5, 5, symbol)
+        history = game_game_over.instance_variable_get(:@column_history)
+        expect(history).to eql([1, 2, 5, 5])
+      end
+
+      it 'increments @round by 1' do
+        symbol = game_game_over.blue_circle
+        game_game_over.check_for_game_over(5, 5, symbol)
+        expect do
+          game_game_over.check_for_game_over(5, 5, symbol)
+        end.to change(game_game_over, :round).by(1)
+      end
+
+      it 'calls #play_round once' do
+        expect(game_game_over).to receive(:play_round).once
+        symbol = game_game_over.blue_circle
+        game_game_over.check_for_game_over(5, 5, symbol)
+      end
     end
   end
 end
