@@ -37,10 +37,9 @@ class Board
   def check_transformation(coord, transformation, symbol, matching = 0)
     new_row = coord[0] + transformation[0]
     new_column = coord[1] + transformation[1]
-    return matching unless new_row.between?(0, 5) && new_column.between?(0, 6)
-    return matching unless board[new_row][new_column] == symbol
+    return matching unless new_row.between?(0, 5) && new_column.between?(0, 6) && board[new_row][new_column] == symbol
 
-    matching += 1 if board[new_row][new_column] == symbol
+    matching += 1
 
     check_transformation([new_row, new_column], transformation, symbol, matching)
   end
